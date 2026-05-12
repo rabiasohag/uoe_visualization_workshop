@@ -3,17 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Digital Humanities Visualization</title>
+    <title>Visualization</title>
 
     <!-- Leaflet CSS -->
     <link
       rel="stylesheet"
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
-
     <!-- D3 -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
-
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -58,6 +56,7 @@
       }
     </style>
   </head>
+
   <body>
     <header>
       <h1>Digital Humanities Visualization</h1>
@@ -65,7 +64,9 @@
     </header>
 
     <main>
+
       <div id="map"></div>
+
       <div id="viz">
         <h2>D3 Visualization</h2>
         <svg id="chart"></svg>
@@ -73,57 +74,127 @@
     </main>
 
     <script>
-      // ======================
-      // LEAFLET MAP
-      // ======================
-
+      // attach the leaflet map to the div with id "map"
       const map = L.map("map").setView([55.9533, -3.1883], 5);
 
+      // add tiles/images to the map
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "&copy; OpenStreetMap contributors",
       }).addTo(map);
 
-      // Example marker
-      L.marker([55.9533, -3.1883])
-        .addTo(map)
-        .bindPopup("University of Edinburgh");
-
-      // ======================
-      // D3 EXAMPLE
-      // ======================
-
+      // attach d3 to the asvg element where you are going to draw the visualization
       const svg = d3.select("#chart");
 
-      svg.append("circle").attr("cx", 150).attr("cy", 150).attr("r", 50);
+      // give the svg width, height, and margins for the visualization
+      const width = 900;
+      const height = 600;
+      const margin = { top: 30, right: 30, bottom: 60, left: 60 };
 
-      svg
-        .append("text")
-        .attr("x", 150)
-        .attr("y", 155)
-        .attr("text-anchor", "middle")
-        .text("D3");
+      // make the svg responsive to different screen sizes
+      svg.attr("viewBox", `0 0 ${width} ${height}`);
 
-      d3.json("data/students.json")
+      // load the data
+      d3.json("data/women_doctors_geo.json")
         .then((data) => {
-          console.log("Loaded data:", data);
 
-          // Create one circle per person
+          console.log(data);
+          
+          // MAP
+          // go through every record in the data and add a marker to the map for each birthplace
+          data.forEach((element) => {
+            if (
+              element.source_data?.birthplace?.lat &&
+              element.source_data?.birthplace?.lon
+            ) {
+              L.marker([
+                element.source_data.birthplace.lat,
+                element.source_data.birthplace.lon,
+              ])
+                .addTo(map)
+                .bindPopup("University of Edinburgh");
+            }
+          });
+
+          // Timeline
+          // clean up the data. make sure years are considered as numbers and filter out any invalid values
+          const years = data
+            .map((d) => Number(d.source_data?.entry_year))
+            .filter((year) => Number.isFinite(year) && year > 0);
+
+          // grouping of the years and countinrg the number per year
+          const timelineData = d3
+            .rollups(
+              years,
+              (values) => values.length,
+              (year) => year,
+            )
+            .map(([year, count]) => ({ year, count }))
+            .sort((a, b) => a.year - b.year);
+
+          // x axis
+          const x = d3
+            .scaleLinear()
+            .domain(d3.extent(timelineData, (d) => d.year))
+            // .nice()
+            .range([margin.left, width - margin.right]);
+
+          // y axis
+          const y = d3
+            .scaleLinear()
+            .domain([0, d3.max(timelineData, (d) => d.count)])
+            // .nice()
+            .range([height - margin.bottom, margin.top]);
+
+          // append both axes to the svg
           svg
-            .selectAll("circle")
-            .data(data)
+            .append("g")
+            .attr("transform", `translate(0,${height - margin.bottom})`)
+            .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+          svg
+            .append("g")
+            .attr("transform", `translate(${margin.left},0)`)
+            .call(d3.axisLeft(y));
+
+          // axis labels
+          svg
+            .append("text")
+            .attr("x", width / 2)
+            .attr("y", height - 15)
+            .attr("text-anchor", "middle")
+            .text("Entry Year");
+
+          svg
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("x", -height / 2)
+            .attr("y", 20)
+            .attr("text-anchor", "middle")
+            .text("Number of Records");
+
+          // line chart
+          const line = d3
+            .line()
+            .x((d) => x(d.year))
+            .y((d) => y(d.count));
+
+          svg
+            .append("path")
+            .datum(timelineData)
+            .attr("fill", "none")
+            .attr("stroke", "steelblue")
+            .attr("stroke-width", 2)
+            .attr("d", line);
+
+          svg
+            .selectAll(".point")
+            .data(timelineData)
             .join("circle")
-            .attr("cx", 100)
-            .attr("cy", (d, i) => 100 + i * 100)
-            .attr("r", 30);
-
-          // Add labels
-          svg
-            .selectAll("text")
-            .data(data)
-            .join("text")
-            .attr("x", 160)
-            .attr("y", (d, i) => 105 + i * 100)
-            .text((d) => `${d.name} (${d.year})`);
+            .attr("class", "point")
+            .attr("cx", (d) => x(d.year))
+            .attr("cy", (d) => y(d.count))
+            .attr("r", 3)
+            .attr("fill", "steelblue");
         })
         .catch((error) => {
           console.error("Error loading JSON:", error);
