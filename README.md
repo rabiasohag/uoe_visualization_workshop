@@ -81,7 +81,7 @@ If you are using a managed university computer, please check in advance whether 
 
 | Files to support your progress |
 |---|
-| [Setup guide before the workshop](./Pre_workshop_00_Setup.md) | 
+| [Setup before the workshop](./Pre_workshop_00_Setup.md) | 
 Installation, GitHub account setup, VS Code setup, and getting the project files |
 | [Building the visualisation](./Part_01_Building_The_Visualisation.md) | 
 A written guide for the hands-on coding and visualisation activity  which follows the live demonstration. This is useful for reference if you choose to have it open whilst you work (optional).|
