@@ -697,7 +697,7 @@ If you are offline, these links may not load:
 
 After building and editing the visualisation, continue to:
 
-[Publishing with GitHub Pages](./02_Publishing_With_GitHub_Pages.md)
+[Publishing with GitHub Pages](./Part_02_Publishing_With_GitHub_Pages.md)
 
 
 [![License: CC BY-NC 4.0](https://licensebuttons.net/l/by-nc/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc/4.0/)
