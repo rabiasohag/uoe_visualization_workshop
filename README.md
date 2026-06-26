@@ -7,7 +7,7 @@ Welcome to this hands-on workshop on creating interactive visualisations for Dig
 
 In this session, we will work with a historical dataset from University of Edinburgh student records and explore how web-based visualisation can help us investigate people, places, and time.
 
-The workshop combines a short introduction to data visualisation with guided practical work. Most of the session will focus on opening, editing, testing, and publishing an interactive visualisation using HTML, D3.js, Leaflet, and GitHub Pages.
+The workshop combines a short introduction to data visualisation with guided practical work. Most of the session will focus on opening, editing, testing, and publishing an interactive visualisation using HTML, D3.js, Leaflet.js, and GitHub Pages.
 
 No advanced programming experience is required. Some familiarity with files, web pages, or code editors may be helpful, but the workshop is designed as a supported, follow-along session.
 
