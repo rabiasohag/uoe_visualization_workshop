@@ -64,7 +64,7 @@ The map and chart are shown side by side in the browser.
 
 Before working through this page, make sure you have completed:
 
-[Setup before the workshop](./00_Setup_Before_Workshop.md)
+[Setup before the workshop](./Part_00_Pre_Workshop_Setup.md)
 
 You should have:
 
